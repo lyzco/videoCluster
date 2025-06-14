@@ -1,4 +1,6 @@
 server:
+  serverName: videoCluster
+  serverId: node-1
   http:
     addr: 0.0.0.0:8000
     timeout: 1s
@@ -6,10 +8,17 @@ server:
     addr: 0.0.0.0:9000
     timeout: 1s
 data:
+  paths:
+    - "/Users/lyz/Documents/Go/video"
   database:
     driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test?parseTime=True&loc=Local
+    source: root:root@tcp(mac.private.com:3306)/test?parseTime=True&loc=Local
   redis:
-    addr: 127.0.0.1:6379
+    addr: mac.private.com:6379
+    password: "123456"
+    db: 0
     read_timeout: 0.2s
     write_timeout: 0.2s
+  consul:
+    address: "mac.private.com:8500"
+    token: "12345678"

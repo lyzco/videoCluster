@@ -2,13 +2,14 @@ package data
 
 import (
 	"videoCluster/internal/conf"
+	"videoCluster/internal/data/cache"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewGreeterRepo)
+var ProviderSet = wire.NewSet(NewData, cache.NewRedisClient, NewBadgerDB, NewVideoVideoRepository)
 
 // Data .
 type Data struct {

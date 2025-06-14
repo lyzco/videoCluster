@@ -3,19 +3,28 @@
 
 openapi: 3.0.3
 info:
-    title: Greeter API
-    description: The greeting service definition.
+    title: NodeService API
     version: 0.0.1
 paths:
-    /helloworld/{name}:
+    /node/v1/videos:
         get:
             tags:
-                - Greeter
-                - subgroup
-            description: Sends a greeting
-            operationId: Greeter_SayHello
+                - NodeService
+            operationId: NodeService_ListVideos
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/node.v1.ListVideosReply'
+    /node/v1/videos/{id}:
+        get:
+            tags:
+                - NodeService
+            operationId: NodeService_GetVideoInfo
             parameters:
-                - name: name
+                - name: id
                   in: path
                   required: true
                   schema:
@@ -26,14 +35,33 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/node.v1.GetVideoInfoReply'
 components:
     schemas:
-        helloworld.v1.HelloReply:
+        node.v1.GetVideoInfoReply:
             type: object
             properties:
-                message:
+                video:
+                    $ref: '#/components/schemas/node.v1.VideoMeta'
+        node.v1.ListVideosReply:
+            type: object
+            properties:
+                videos:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/node.v1.VideoMeta'
+        node.v1.VideoMeta:
+            type: object
+            properties:
+                id:
                     type: string
-            description: The response message containing the greetings
+                title:
+                    type: string
+                path:
+                    type: string
+                size:
+                    type: string
+                thumbnail:
+                    type: string
 tags:
-    - name: Greeter
+    - name: NodeService

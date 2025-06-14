@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package central.v1;
+
+option go_package = "central/api/central/v1;v1";
+
+service CentralService {
+  rpc ListVideos (ListVideosRequest) returns (ListVideosReply);
+  rpc GetVideoInfo (GetVideoInfoRequest) returns (GetVideoInfoReply);
+}
+
+message ListVideosRequest {}
+
+message ListVideosReply {
+  repeated VideoMeta videos = 1;
+}
+
+message GetVideoInfoRequest {
+  string id = 1;
+}
+
+message GetVideoInfoReply {
+  VideoMeta video = 1;
+}
+
+message VideoMeta {
+  string id = 1;
+  string title = 2;
+  string path = 3;
+  int64 size = 4;
+  string thumbnail = 5;
+  string node_addr = 6; // 记录视频在哪个节点
+  bool is_public = 7;
+}

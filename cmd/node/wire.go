@@ -6,18 +6,18 @@
 package main
 
 import (
-	"videoCluster/internal/biz"
-	"videoCluster/internal/conf"
-	"videoCluster/internal/data"
-	"videoCluster/internal/server"
-	"videoCluster/internal/service"
-
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+	"videoCluster/internal/biz"
+	"videoCluster/internal/conf"
+	"videoCluster/internal/consul"
+	"videoCluster/internal/data"
+	"videoCluster/internal/node/server"
+	"videoCluster/internal/node/service"
 )
 
 // wireApp init kratos application.
 func wireApp(*conf.Server, *conf.Data, log.Logger) (*kratos.App, func(), error) {
-	panic(wire.Build(server.ProviderSet, data.ProviderSet, biz.ProviderSet, service.ProviderSet, newApp))
+	panic(wire.Build(server.ProviderSet, data.ProviderSet, biz.ProviderSet, service.ProviderSet, consul.ProviderSet, newApp))
 }

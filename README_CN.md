@@ -50,6 +50,8 @@ VidCluster 是一个支持多节点视频存储、聚合与流媒体播放的分
 - gRPC
 - HTTP (Range Streaming)
 - Consul
+- ffmpeg
+- BadgerDB
 
 ---
 

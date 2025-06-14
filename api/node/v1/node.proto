@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package node.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "node/api/node/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.node.v1";
+option java_outer_classname = "NodeProtoV1";
+
+service NodeService {
+  rpc ListVideos(ListVideosRequest) returns (ListVideosReply) {
+    option (google.api.http) = {
+      get: "/node/v1/videos"
+    };
+  };
+  rpc GetVideoInfo(GetVideoInfoRequest) returns (GetVideoInfoReply) {
+    option (google.api.http) = {
+      get: "/node/v1/videos/{id}"
+    };
+  };
+}
+
+message VideoMeta {
+  string id = 1;
+  string title = 2;
+  string path = 3;
+  int64 size = 4;
+  string thumbnail = 5;
+}
+
+message ListVideosRequest {}
+message ListVideosReply {
+  repeated VideoMeta videos = 1;
+}
+
+message GetVideoInfoRequest {
+  string id = 1;
+}
+message GetVideoInfoReply {
+  VideoMeta video = 1;
+}
+

@@ -49,6 +49,8 @@ VidCluster is a distributed video management system that supports multi-node vid
 - gRPC
 - HTTP (Range Streaming)
 - Consul
+- ffmpeg
+- BadgerDB
 
 ---
 
