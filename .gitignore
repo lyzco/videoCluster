@@ -46,7 +46,7 @@ agents.md
 # Runtime configuration is environment-specific. Commit only config.example.yaml.
 configs/*/config.yaml
 
-# Generated code and API specifications
+# Generated code and API specifications are produced by CI and Release.
 *.pb.go
 *_grpc.pb.go
 *_http.pb.go

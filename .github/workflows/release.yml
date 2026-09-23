@@ -20,6 +20,16 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - uses: arduino/setup-protoc@v3
+
+      - name: Install code generators
+        run: |
+          make init
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Generate protobuf and Wire code
+        run: make generate
+
       - name: Test
         run: make test
 

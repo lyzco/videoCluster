@@ -26,10 +26,8 @@ jobs:
           make init
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
-      - name: Verify generated code is committed
-        run: |
-          make generate
-          git diff --exit-code
+      - name: Generate protobuf and Wire code
+        run: make generate
 
       - name: Test
         run: make test

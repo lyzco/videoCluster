@@ -80,7 +80,8 @@ build-mac: build
 
 # generate Wire dependency injection code
 wire: config
-	go generate ./...
+	wire ./cmd/central
+	wire ./cmd/node
 
 # generate all protobuf, OpenAPI, and Wire code
 generate: api wire
