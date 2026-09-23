@@ -41,4 +41,3 @@ message GetVideoInfoRequest {
 message GetVideoInfoReply {
   VideoMeta video = 1;
 }
-

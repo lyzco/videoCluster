@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/go-kratos/consul/registry"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
@@ -11,13 +10,12 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	"github.com/hashicorp/consul/api"
-	"os"
-	"videoCluster/internal/biz"
-	"videoCluster/internal/conf"
-	"videoCluster/internal/node/job"
-
 	_ "go.uber.org/automaxprocs"
+	"os"
+	"videoCluster/internal/consul"
+	"videoCluster/internal/node/biz"
+	"videoCluster/internal/node/conf"
+	"videoCluster/internal/node/job"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
@@ -33,13 +31,11 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "conf", "config.yaml", "config path, eg: -conf config.yaml")
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, cc *api.Client, vs *biz.VideoScanner) *kratos.App {
-	jobManager := job.NewJobManager(vs)
-
-	return kratos.New(
+func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, registrar *consul.NodeRegistrar, vs *biz.VideoScanner, data *conf.Data) *kratos.App {
+	opts := []kratos.Option{
 		kratos.ID(id),
 		kratos.Name(Name),
 		kratos.Version(Version),
@@ -49,16 +45,32 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, cc *api.Client,
 			gs,
 			hs,
 		),
-		kratos.Registrar(registry.New(cc)),
-		kratos.BeforeStart(func(ctx context.Context) error {
-			jobManager.Start()
-			return nil
-		}),
-		kratos.AfterStop(func(ctx context.Context) error {
-			jobManager.Stop()
-			return nil
-		}),
-	)
+		kratos.Registrar(registrar),
+	}
+
+	if data.ScanVideo {
+		if data.ScanInterval == nil || data.ScanInterval.AsDuration() <= 0 {
+			panic("data.scanInterval must be a positive duration when data.scanVideo is true")
+		}
+
+		jobManager := job.NewJobManager(func() {
+			if err := vs.ScanAndCache(context.Background()); err != nil {
+				log.Context(context.Background()).Errorf("scan videos failed: %v", err)
+			}
+		}, data.ScanInterval.AsDuration(), false)
+		opts = append(opts,
+			kratos.BeforeStart(func(ctx context.Context) error {
+				jobManager.Start()
+				return nil
+			}),
+			kratos.AfterStop(func(ctx context.Context) error {
+				jobManager.Stop()
+				return nil
+			}),
+		)
+	}
+
+	return kratos.New(opts...)
 }
 
 func main() {

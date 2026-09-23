@@ -5,12 +5,12 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	v1 "videoCluster/api/node/v1"
-	"videoCluster/internal/conf"
+	"videoCluster/internal/node/conf"
 	"videoCluster/internal/node/service"
 )
 
-// NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, video *service.VideoService, logger log.Logger) *http.Server {
+// NewHTTPServer creates the Node HTTP server and registers its routes.
+func NewHTTPServer(c *conf.Server, video *service.VideoService, stream *VideoStreamHandler, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -26,6 +26,9 @@ func NewHTTPServer(c *conf.Server, video *service.VideoService, logger log.Logge
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
+	route := srv.Route("/")
+	route.GET(videoStreamPath, stream.Handle)
+	route.HEAD(videoStreamPath, stream.Handle)
 	v1.RegisterNodeServiceHTTPServer(srv, video)
 	return srv
 }

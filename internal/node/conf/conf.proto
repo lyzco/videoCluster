@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package node.conf;
+
+option go_package = "videoCluster/internal/node/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+  string server_name = 3;
+  string server_id = 4;
+  string advertise_host = 5;
+}
+
+message Data {
+  message Consul {
+    string address = 1;
+    string token = 2;
+  }
+  repeated string paths = 1;
+  Consul consul = 2;
+  bool scan_video = 3;
+  google.protobuf.Duration scan_interval = 4;
+}

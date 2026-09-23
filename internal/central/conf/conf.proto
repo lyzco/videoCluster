@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package central.conf;
+
+option go_package = "videoCluster/internal/central/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+  string server_name = 3;
+  string server_id = 4;
+}
+
+message Data {
+  message Redis {
+    string addr = 1;
+    string password = 2;
+    int32 db = 3;
+  }
+  message Consul {
+    string address = 1;
+    string token = 2;
+  }
+  Redis redis = 1;
+  Consul consul = 2;
+}

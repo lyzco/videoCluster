@@ -5,4 +5,7 @@ import (
 )
 
 // ProviderSet is server providers.
-var ProviderSet = wire.NewSet(NewConsulClient)
+var CentralProviderSet = wire.NewSet(NewCentralConsulClient)
+
+// NodeProviderSet contains the Consul client and Node-specific registrar.
+var NodeProviderSet = wire.NewSet(NewNodeConsulClient, NewNodeRegistrar)

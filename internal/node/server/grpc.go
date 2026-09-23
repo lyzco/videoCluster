@@ -5,7 +5,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	v1 "videoCluster/api/node/v1"
-	"videoCluster/internal/conf"
+	"videoCluster/internal/node/conf"
 	"videoCluster/internal/node/service"
 )
 

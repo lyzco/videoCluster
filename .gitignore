@@ -37,3 +37,18 @@ bin/
 .vscode/
 .idea/
 *.swp
+
+# Local agent guidance
+agents.md
+
+# Runtime configuration is environment-specific. Commit only config.example.yaml.
+configs/*/config.yaml
+
+# Generated code and API specifications
+*.pb.go
+*_grpc.pb.go
+*_http.pb.go
+wire_gen.go
+openapi.yaml
+openapi.json
+swagger.json

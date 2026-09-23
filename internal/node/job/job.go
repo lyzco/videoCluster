@@ -2,29 +2,41 @@ package job
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"github.com/robfig/cron/v3"
-	"videoCluster/internal/biz"
 )
 
 type JobManager struct {
-	c *cron.Cron
+	c               *cron.Cron
+	allowConcurrent bool
+	runMu           sync.Mutex
+	task            func()
 }
 
-func NewJobManager(scanner *biz.VideoScanner) *JobManager {
+func NewJobManager(task func(), interval time.Duration, allowConcurrent bool) *JobManager {
 	c := cron.New()
+	manager := &JobManager{c: c, allowConcurrent: allowConcurrent, task: task}
+	c.Schedule(cron.Every(interval), cron.FuncJob(manager.Run))
 
-	// 每5分钟扫描
-	c.AddFunc("*/30 * * * *", func() {
-		err := scanner.ScanAndCache(context.Background())
-		if err != nil {
+	return manager
+}
+
+// Run executes the task once.
+func (j *JobManager) Run() {
+	if !j.allowConcurrent {
+		if !j.runMu.TryLock() {
 			return
 		}
-	})
-
-	return &JobManager{c: c}
+		defer j.runMu.Unlock()
+	}
+	j.task()
 }
 
 func (j *JobManager) Start() {
+	// Populate the local catalog before scheduling subsequent scans.
+	j.Run()
 	j.c.Start()
 }
 

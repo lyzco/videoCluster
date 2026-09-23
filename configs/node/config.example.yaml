@@ -1,0 +1,24 @@
+server:
+  # 每个节点必须使用唯一 ID。
+  serverName: videoCluster-media-node
+  serverId: media-node-1
+  # The address Consul and Central can reach; do not use 0.0.0.0.
+  advertiseHost: 192.168.1.25
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 1s
+data:
+  # 是否启用本地视频扫描；启用时 scanInterval 必须为正数。
+  scanVideo: false
+  # 扫描间隔，支持 Go duration，例如 30m、1h。
+  scanInterval: 30m
+  paths:
+    # 改为本机的视频目录。
+    - "/path/to/videos"
+  consul:
+  # The shared Consul Agent; every Media Node registers through this address.
+    address: "consul.example.internal:8500"
+    token: ""
