@@ -9,7 +9,9 @@ LDFLAGS ?= -X main.Version=$(VERSION)
 
 PROTOC_GEN_GO_VERSION := v1.34.2
 PROTOC_GEN_GO_GRPC_VERSION := v1.5.1
-KRATOS_VERSION := v2.8.0
+# The protoc-gen-go-http module has no v2.8.4 module tag. This pseudo-version
+# resolves to Kratos v2.8.4's commit (982270e9576b).
+PROTOC_GEN_GO_HTTP_VERSION := v2.0.0-20250307161706-982270e9576b
 GNOSTIC_VERSION := v0.7.0
 WIRE_VERSION := v0.6.0
 
@@ -31,8 +33,7 @@ endif
 init:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
-	go install github.com/go-kratos/kratos/cmd/kratos/v2@$(KRATOS_VERSION)
-	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@$(KRATOS_VERSION)
+	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@$(PROTOC_GEN_GO_HTTP_VERSION)
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@$(GNOSTIC_VERSION)
 	go install github.com/google/wire/cmd/wire@$(WIRE_VERSION)
 

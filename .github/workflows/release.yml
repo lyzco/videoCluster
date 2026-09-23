@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,53 +20,14 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - uses: arduino/setup-protoc@v3
-
-      - name: Install code generators
-        run: |
-          make init
-          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
-
-      - name: Generate code
-        run: make generate
-
       - name: Test
         run: make test
 
-      - name: Build release archives
+      - name: Build and publish GitHub Release
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
         env:
-          VERSION: ${{ github.ref_type == 'tag' && github.ref_name || format('dev-{0}', github.sha) }}
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          for service in central node; do
-            for target in linux/amd64 windows/amd64 darwin/amd64 darwin/arm64; do
-              goos="${target%/*}"
-              goarch="${target#*/}"
-              package="videoCluster-${service}-${goos}-${goarch}"
-              stage="dist/${package}"
-              mkdir -p "${stage}/configs"
-
-              extension=""
-              if [ "${goos}" = "windows" ]; then
-                extension=".exe"
-              fi
-              CGO_ENABLED=0 GOOS="${goos}" GOARCH="${goarch}" \
-                go build -trimpath -ldflags="-s -w -X main.Version=${VERSION}" \
-                -o "${stage}/videoCluster-${service}${extension}" "./cmd/${service}"
-              cp "configs/${service}/config.example.yaml" "${stage}/configs/config.yaml"
-
-              if [ "${goos}" = "windows" ]; then
-                (cd dist && zip -rq "${package}.zip" "${package}")
-              else
-                tar -C dist -czf "dist/${package}.tar.gz" "${package}"
-              fi
-              rm -rf "${stage}"
-            done
-          done
-
-      - name: Publish GitHub Release
-        if: github.ref_type == 'tag'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" dist/*.tar.gz dist/*.zip --generate-notes
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

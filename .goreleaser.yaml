@@ -1,0 +1,83 @@
+version: 2
+project_name: videoCluster
+
+before:
+  hooks:
+    - mkdir -p .goreleaser/central .goreleaser/node
+    - cp configs/central/config.example.yaml .goreleaser/central/config.yaml
+    - cp configs/node/config.example.yaml .goreleaser/node/config.yaml
+
+builds:
+  - id: central
+    main: ./cmd/central
+    binary: videoCluster-central
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: linux
+        goarch: arm64
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w -X main.Version={{ .Version }}
+
+  - id: node
+    main: ./cmd/node
+    binary: videoCluster-node
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: linux
+        goarch: arm64
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w -X main.Version={{ .Version }}
+
+archives:
+  - id: central
+    ids:
+      - central
+    name_template: videoCluster-central-{{ .Os }}-{{ .Arch }}
+    wrap_in_directory: videoCluster-central-{{ .Os }}-{{ .Arch }}
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - src: .goreleaser/central/config.yaml
+        strip_parent: true
+
+  - id: node
+    ids:
+      - node
+    name_template: videoCluster-node-{{ .Os }}-{{ .Arch }}
+    wrap_in_directory: videoCluster-node-{{ .Os }}-{{ .Arch }}
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - src: .goreleaser/node/config.yaml
+        strip_parent: true
+
+checksum:
+  name_template: checksums.txt

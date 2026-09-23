@@ -32,6 +32,8 @@ Thumbs.db
 *.key
 *.log
 bin/
+dist/
+.goreleaser/
 
 # Develop tools
 .vscode/
